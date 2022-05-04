@@ -1,0 +1,41 @@
+---
+ansible_python_interpreter: "/root/venv-rhocs-backup/bin/python"
+
+## Environment variables for RHOCS Backup: 
+## Deployment mode for RHOCS cluster: converged (CNS) or independent (CRS)
+rhocsmode: "converged"
+
+## Authentication variables for accessing OpenShift cluster or
+## Gluster nodes depending on deployment mode
+ocaddress: "https://openshift.example.com:8443"
+ocuser: "user"
+ocpass: "mypassword"
+## OpenShift project where gluster cluster lives
+ocproject: "glusterfs"
+
+## Any of the Gluster servers from RHOCS converged cluster
+## used for mounting gluster snapshots
+glusterserver: "192.168.0.19"
+
+## Directory for temporary files to put the list of 
+## Gluster volumes /snaps to backup
+#voldir: "/root"
+#snapdir: "/root"
+
+## Destination directory for mounting snapshots of Gluster volumes:
+parentdir: "/mnt/source"
+
+## Heketi Route and Credentials
+## User with admin permissions to dialog with Heketi
+userheketi: "admin"
+## Heketi user key
+secretheketi: "heketiuserkey"
+## Route where Heketi pod is listening
+heketi_cli_server: "http://heketi-storage-glusterfs.apps.openshift.example.org"
+
+## Provides Logging of this script in the dir specified below:
+logdir: "~/"
+
+## In case of rhocs-oneshot-backup, set this variable to provide
+## destination path for tar compressed backups. Otherwise, keep it commented.
+destination: "/var/backup"

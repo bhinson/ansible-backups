@@ -1,0 +1,7 @@
+---
+
+- name: Backup OpenShift Container Storage volumes
+  hosts: localhost
+  roles:
+    - role: backup_rhocs
+

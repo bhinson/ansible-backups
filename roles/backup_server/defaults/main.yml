@@ -1,0 +1,4 @@
+---
+# dest_path: /mnt/backup/servername
+# root_vg: rhel
+# root_lv: root

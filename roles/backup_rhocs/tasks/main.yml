@@ -1,0 +1,37 @@
+---
+## Playbook to backup to a mount point destination 
+## existing persistent volumes in OpenShift from Gluster/RHOCS
+
+- name: Set directories with backup timestamp
+  set_fact:
+    ## Temporary file to put the list of Gluster volumes to backup
+    vollist: "~/vollist-{{ lookup('pipe','date +%Y%m%d-%H%M') }}.txt"
+    ## Parent directory for all volumes mounting
+    parentmount: "{{ parentdir }}/rhocs-backup-{{ lookup('pipe','date +%Y%m%d-%H%M') }}"
+    ## Daily/Hourly destination of backups
+    target: "{{ destination }}/rhocs-backup-{{ lookup('pipe','date +%Y%m%d-%H%M') }}"
+
+- name: Create parent directory
+  file:
+    path: "{{ parentmount }}"
+    state: directory
+
+## Get list of Persistent Volumes in Gluster with Heketi until now and 
+## store them in a file, excluding gluster-block and heketidb
+- name: Ensure Gluster client is installed
+  yum:
+    name: heketi-client
+    state: present
+
+- name: Get list of persistent volumes
+  shell: '/usr/bin/heketi-cli volume list --server {{ heketi_cli_server }} --user {{ userheketi }} --secret {{ secretheketi }} | /usr/bin/grep -v block | /usr/bin/grep -v heketidbstorage | /usr/bin/cut -d":" -f4 > {{ vollist }}'
+
+## If converged mode, get name of gluster pod
+- name: Get name of gluster pod
+  block:
+
+  - name: Login to OpenShift
+    shell: "oc login {{ ocaddress }} -u {{ ocuser }} -p {{ ocpass }} --insecure-skip-tls-verify"
+    no_log: true
+
+  when: rhocsmode == "converged"

@@ -1,0 +1,47 @@
+---
+# Take LVM snapshot and perform rsync backup
+
+- name: Check destination is mounted
+  mount:
+    path: /mnt/backup
+    src: /dev/backup/backup
+    fstype: xfs
+    state: mounted
+    fstab: /tmp/fstab
+
+- name: Ensure backup folder exists
+  file:
+    path: '{{ dest_path }}'
+    state: directory
+
+- name: Create LVM snapshot of root filesystem
+  lvol:
+    vg: '{{ root_vg }}'
+    lv: '{{ root_lv }}'
+    snapshot: '{{ root_lv }}-snapshot'
+    size: 100%FREE
+
+- name: Mount snapshot
+  mount:
+    path: /mnt/snapshot
+    src: '/dev/{{ root_vg }}/{{ root_lv }}-snapshot'
+    fstype: xfs
+    opts: nouuid
+    state: mounted
+    fstab: /tmp/fstab
+
+- name: Create new backup
+  command: rsync -aHS --delete /mnt/snapshot/ {{ dest_path }}
+#TODO: alternatively run 'rsync -avxAXHS'
+
+- name: Unmount snapshot
+  mount:
+    path: /mnt/snapshot
+    state: unmounted
+
+- name: Remove LVM snapshot
+  lvol:
+    vg: '{{ root_vg }}'
+    lv: '{{ root_lv }}-snapshot'
+    state: absent
+    force: yes

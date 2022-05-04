@@ -1,0 +1,7 @@
+---
+
+- name: Perform backup
+  hosts: backup_source
+  roles:
+    - role: backup_server
+
