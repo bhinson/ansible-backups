@@ -15,7 +15,7 @@
     state: directory
 
 - name: Create LVM snapshot of root filesystem
-  lvol:
+  community.general.lvol:
     vg: '{{ root_vg }}'
     lv: '{{ root_lv }}'
     snapshot: '{{ root_lv }}-snapshot'
@@ -40,7 +40,7 @@
     state: unmounted
 
 - name: Remove LVM snapshot
-  lvol:
+  community.general.lvol:
     vg: '{{ root_vg }}'
     lv: '{{ root_lv }}-snapshot'
     state: absent
